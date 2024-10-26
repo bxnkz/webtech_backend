@@ -80,3 +80,31 @@ export async function postMember(req,res){
         return res.json({messageregister:'fail'})
     }
 }
+
+export async function getSession(req,res) {
+    console.log(`GET /getSession is requested`)
+    console.log(req.session)
+    const thedata={
+        email:req.session.memEmail,
+        name:req.session.memName,
+        duty:req.session.dutyId
+    }
+    console.log(thedata)
+    return res.json(thedata)
+}
+
+export async function logoutMember(req,res){
+    console.log(`GET /logoutMembers is requested`)
+    try{
+        // ลบเฉพาะ key ที่ระบุ
+        // delete req.session.someKey;
+        // ล้าง Session ทั้งหมด
+        req.session.destroy()
+        // ลบ Cookie ด้วย
+        res.clearCookie('connect.sid')
+        return res.status(200).json({messagelogout:'success'})
+    }catch(err)
+    {
+        return res.status(500).json({messagelogout:'fail'})
+    }
+}
