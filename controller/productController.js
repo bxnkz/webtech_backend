@@ -1,3 +1,4 @@
+
 import database from "../service/database.js";
 import multer from "multer";
 import path from "path";
@@ -102,5 +103,22 @@ export async function editProduct(req,res){
         return res.status(200).json({message:'Product updated successfully',data: result})
     }catch(err){
         return res.status(500).json({error:err.message})
+    }
+}
+
+export async function getEditProduct(req, res) {
+    console.log('GET id products is requested');
+    try {
+        const result = await database.query(
+            {
+               text: `SELECT * FROM	foods f
+            WHERE f."foodId" ILIKE $1
+            `,
+            values:[req.params.id]
+            });
+        return res.status(200).json(result.rows);
+        
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
     }
 }
