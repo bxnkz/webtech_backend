@@ -11,6 +11,7 @@ const app = express()
 const port = process.env.PORT
 
 app.use(bodyParser.json())
+app.use("/img_fd",express.static('img_fd'))
 app.use(cors({
     origin:['http://localhost:8080','http://127.0.0.1:8080'],
     methods: ['GET','POST','PUT','DELETE'],
