@@ -84,26 +84,36 @@ export async function deleteProduct(req,res){
     }
 }
 
-export async function editProduct(req,res){
-    console.log('PUT Edit Product is requested')
+export async function editProduct(req, res) {
+    console.log('PUT Edit Product is requested');
     const foodId = req.params.id;
-    const {foodName,description,price,category} = req.body;
-    try{
-        const existsResult = await database.query({
-            text:`SELECT EXISTS (SELECT * FROM foods WHERE "foodId"=$1)`,
-            values:[foodId]
-        })
-        if(!existsResult.rows[0].exists){
-            return res.status(400).json({error:`Food ID ${foodId} not found`})
+
+    // ใช้ multer เพื่ออัปโหลดไฟล์ภาพ
+    upload(req, res, async function (err) {
+        if (err) {
+            return res.status(500).json({ error: 'Image upload failed' });
         }
-        const result = await database.query({
-            text:`UPDATE foods SET "foodName"=$1, "description"=$2, "price"=$3, "category"=$4 WHERE "foodId"=$5`,
-            values:[foodName,description,price,category,foodId]
-        })
-        return res.status(200).json({message:'Product updated successfully',data: result})
-    }catch(err){
-        return res.status(500).json({error:err.message})
-    }
+
+        const { foodName, description, price, category } = req.body;
+        try {
+            const existsResult = await database.query({
+                text: `SELECT EXISTS (SELECT * FROM foods WHERE "foodId"=$1)`,
+                values: [foodId]
+            });
+            if (!existsResult.rows[0].exists) {
+                return res.status(400).json({ error: `Food ID ${foodId} not found` });
+            }
+
+            // อัปเดตข้อมูลรวมถึงค่าใหม่ (ไม่มีไฟล์ภาพ)
+            const result = await database.query({
+                text: `UPDATE foods SET "foodName"=$1, "description"=$2, "price"=$3, "category"=$4 WHERE "foodId"=$5`,
+                values: [foodName, description, price, category, foodId]
+            });
+            return res.status(200).json({ message: 'Product updated successfully', data: result });
+        } catch (err) {
+            return res.status(500).json({ error: err.message });
+        }
+    });
 }
 
 export async function getEditProduct(req, res) {
