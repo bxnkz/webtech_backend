@@ -56,7 +56,27 @@ export async function postProduct(req, res) {
 export async function getAllProduct(req, res) {
     console.log('GET All products is requested');
     try {
-        const result = await database.query(`SELECT * FROM foods`);
+        const result = await database.query(`SELECT * FROM foods ORDER BY "foodId" ASC;`);
+        return res.status(200).json(result.rows);
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+}
+
+export async function getFoodMenu(req, res) {
+    console.log('GET All products is requested');
+    try {
+        const result = await database.query(`SELECT * FROM foods WHERE category='maindish' ORDER BY "foodId" ASC;`);
+        return res.status(200).json(result.rows);
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+}
+
+export async function getDrinkMenu(req, res) {
+    console.log('GET All products is requested');
+    try {
+        const result = await database.query(`SELECT * FROM foods WHERE category='drink' ORDER BY "foodId" ASC;`);
         return res.status(200).json(result.rows);
     } catch (err) {
         return res.status(500).json({ error: err.message });
@@ -130,5 +150,19 @@ export async function getEditProduct(req, res) {
         
     } catch (err) {
         return res.status(500).json({ error: err.message });
+    }
+}
+
+export async function getSearchProduct(req,res){
+    console.log('GET /Search is requested')
+    try{
+        const result = await database.query({
+            text: `SELECT * FROM foods WHERE "foodName" ILIKE $1`,
+            values:[`%${req.params.id}%`]
+        })
+        return res.status(200).json(result.rows)
+    }
+    catch(err){
+        return res.status(500).json({error:err.message})
     }
 }

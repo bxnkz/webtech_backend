@@ -1,5 +1,19 @@
 import database from "../service/database.js";
 import bcrypt from "bcrypt";
+import multer from "multer";
+
+const storage = multer.diskStorage({
+    destination: function (req,file,cb){
+        cb(null, 'img_mem')
+    },
+    filename: function (req,file,cb){
+        const filename = `${req.session.memEmail}.jpg`
+        cb(null, filename)
+    }
+})
+const upload = multer({
+    storage: storage,
+}).single('file');
 
 export async function loginMember(req,res){
     console.log('POST /loginMembers is requested')
@@ -107,4 +121,13 @@ export async function logoutMember(req,res){
     {
         return res.status(500).json({messagelogout:'fail'})
     }
+}
+
+export async function uploadMember(req,res){
+    upload(req,res,(err) => {
+        if(err){
+            return res.status(400).json({message: err.message})
+        }
+        res.status(200).json({message: "File uploaded successfully."})
+    })
 }

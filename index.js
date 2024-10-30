@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import memberRoute from "./route/memberRoute.js";
 import productRoute from "./route/productRoute.js"
+import cartRoute from "./route/cartRoute.js"
 import cors from "cors";
 import session from "express-session";
 
@@ -12,6 +13,7 @@ const port = process.env.PORT
 
 app.use(bodyParser.json())
 app.use("/img_fd",express.static('img_fd'))
+app.use("/img_mem",express.static('img_mem'))
 app.use(cors({
     origin:['http://localhost:8080','http://127.0.0.1:8080'],
     methods: ['GET','POST','PUT','DELETE'],
@@ -26,7 +28,7 @@ app.use(session({
 
 app.use(memberRoute)
 app.use(productRoute)
-
+app.use(cartRoute)
 
 
 app.get('/',(req,res)=>{
