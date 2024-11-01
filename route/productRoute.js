@@ -10,6 +10,7 @@ router.get('/getdrink',productC.getDrinkMenu)
 router.delete('/products/:id',productC.deleteProduct)
 router.put('/products/edit/:id',productC.editProduct)
 router.get('/products/edit/:id',productC.getEditProduct)
-router.get('/products/search/:id',productC.getSearchProduct)
+router.get('/products/search/:id',productC.getSearchFood)
+router.get('/products/searchdrk/:id',productC.getSearchDrink)
 
 export default router

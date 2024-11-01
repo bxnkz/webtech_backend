@@ -153,11 +153,25 @@ export async function getEditProduct(req, res) {
     }
 }
 
-export async function getSearchProduct(req,res){
+export async function getSearchFood(req,res){
     console.log('GET /Search is requested')
     try{
         const result = await database.query({
-            text: `SELECT * FROM foods WHERE "foodName" ILIKE $1`,
+            text: `SELECT * FROM foods WHERE "foodName" ILIKE $1 AND "category"='maindish'`,
+            values:[`%${req.params.id}%`]
+        })
+        return res.status(200).json(result.rows)
+    }
+    catch(err){
+        return res.status(500).json({error:err.message})
+    }
+}
+
+export async function getSearchDrink(req,res){
+    console.log('GET /Search is requested')
+    try{
+        const result = await database.query({
+            text: `SELECT * FROM foods WHERE "foodName" ILIKE $1 AND "category"='drink'`,
             values:[`%${req.params.id}%`]
         })
         return res.status(200).json(result.rows)

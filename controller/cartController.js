@@ -193,3 +193,72 @@ export async function getCartByCus(req, res) {
         })
     }
 }
+
+export async function updateCartDtl(req, res) {
+    console.log(`POST Update CartDtl is Requested`);
+    const { cartId, pdId, newQty } = req.body;
+
+    try {
+        const result = await database.query({
+            text: `UPDATE "cartDtl" 
+                   SET qty = $1 
+                   WHERE "cartId" = $2 AND "pdId" = $3`,
+            values: [newQty, cartId, pdId]
+        });
+
+        if (result.rowCount > 0) {
+            return res.status(200).json({ message: "Quantity updated successfully!" });
+        } else {
+            return res.status(404).json({ message: "Cart detail not found." });
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            error: err.message
+        });
+    }
+}
+
+export async function confirmOrder(req, res) {
+    console.log(`POST /carts/confirmOrder is requested`);
+    try {
+        const { cartId, cartCf } = req.body;
+        if (!cartId) {
+            return res.json({ success: false, message: 'Cart ID is required' });
+        }
+        const result = await database.query({
+            text: `UPDATE carts SET "cartCf" = $1 WHERE "cartId" = $2`,
+            values: [cartCf, cartId]
+        });
+        if (result.rowCount > 0) {
+            return res.json({ success: true });
+        } else {
+            return res.json({ success: false, message: 'Cart not found or already confirmed' });
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: err.message });
+    }
+}
+
+export async function deleteCart(req, res) {
+    console.log(`DELETE /carts/deleteCart is requested`);
+    const cartId = req.params.id;
+    try {
+        if (!cartId) {
+            return res.json({ success: false, message: 'Cart ID is required' });
+        }
+        const result = await database.query({
+            text: `DELETE FROM carts WHERE "cartId" = $1`,
+            values: [cartId]
+        });
+        if (result.rowCount > 0) {
+            return res.json({ success: true, message: 'Cart deleted successfully' });
+        } else {
+            return res.json({ success: false, message: 'Cart not found or already deleted' });
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: err.message });
+    }
+}
