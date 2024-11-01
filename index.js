@@ -6,10 +6,19 @@ import productRoute from "./route/productRoute.js"
 import cartRoute from "./route/cartRoute.js"
 import cors from "cors";
 import session from "express-session";
+import swaggerUI from "swagger-ui-express";
+import yaml from "yaml";
+import fs from "fs";
+
 
 dotenv.config()
 const app = express()
 const port = process.env.PORT
+
+const swaggerfile = fs.readFileSync('service/swagger.yaml','utf-8')
+const swaggerDoc = yaml.parse(swaggerfile)
+
+app.use('/api-docs',swaggerUI.serve,swaggerUI.setup(swaggerDoc))
 
 app.use(bodyParser.json())
 app.use("/img_fd",express.static('img_fd'))

@@ -1,0 +1,663 @@
+openapi: 3.0.0
+info:
+  title: WEB ขายอาหาร
+  description: KUSHOP Project from Kasetsart University Sriracha Campus.
+  version: 0.1
+
+servers:
+  - url: http://localhost:3000/
+
+tags:
+  - name: Member
+    description: Member-related operations
+  - name: Product
+    description: Product-related operations
+  - name: Cart
+    description: Cart-related operations
+
+paths:
+  /members:
+    post:
+      tags:
+        - Member
+      summary: Registers a new Member.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/memberCreate'
+      responses:
+        '201':
+          description: Member is created.
+        '409':
+          description: Email already exists.
+        '500':
+          description: Server Error
+
+  /members/login:
+    post:
+      tags:
+        - Member
+      summary: Logs in a Member.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/memberLogin'
+      responses:
+        '200':
+          description: Member login successful.
+        '401':
+          description: Unauthorized - invalid credentials.
+        '500':
+          description: Server Error
+
+  /members/getss:
+    get:
+      tags:
+        - Member
+      summary: Retrieves current session information.
+      responses:
+        '200':
+          description: Session data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                  name:
+                    type: string
+                  duty:
+                    type: string
+        '401':
+          description: Unauthorized - no active session.
+
+  /members/logout:
+    get:
+      tags:
+        - Member
+      summary: Logs out the current session.
+      responses:
+        '200':
+          description: Logout successful.
+        '500':
+          description: Server Error during logout.
+
+  /members/uploadImg:
+    post:
+      tags:
+        - Member
+      summary: Uploads a profile image for the member.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Image uploaded successfully.
+        '400':
+          description: Bad request - image upload failed.
+
+
+
+  /products/addproduct:
+    post:
+      tags:
+        - Product
+      summary: Adds a new product.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                foodId:
+                  type: string
+                foodName:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                category:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Product added successfully.
+        '409':
+          description: Conflict - foodId already exists.
+        '500':
+          description: Server error.
+
+  /products:
+    get:
+      tags:
+        - Product
+      summary: Gets all products.
+      responses:
+        '200':
+          description: List of all products.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/food'
+        '500':
+          description: Server error.
+
+  /getfoods:
+    get:
+      tags:
+        - Product
+      summary: Gets all maindish products.
+      responses:
+        '200':
+          description: List of main dishes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/food'
+        '500':
+          description: Server error.
+
+  /getdrink:
+    get:
+      tags:
+        - Product
+      summary: Gets all drink products.
+      responses:
+        '200':
+          description: List of drinks.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/food'
+        '500':
+          description: Server error.
+
+  /products/{id}:
+    delete:
+      tags:
+        - Product
+      summary: Deletes a product by ID.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The ID of the product to delete.
+      responses:
+        '200':
+          description: Product deleted successfully.
+        '404':
+          description: Product not found.
+        '500':
+          description: Server error.
+
+  /products/edit/{id}:
+    put:
+      tags:
+        - Product
+      summary: Updates a product by ID.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The ID of the product to update.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                foodName:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                category:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Product updated successfully.
+        '400':
+          description: Product not found.
+        '500':
+          description: Server error.
+
+    get:
+      tags:
+        - Product
+      summary: Gets a product by ID.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The ID of the product to retrieve.
+      responses:
+        '200':
+          description: Product details retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/food'
+        '404':
+          description: Product not found.
+        '500':
+          description: Server error.
+
+  /products/search/{id}:
+    get:
+      tags:
+        - Product
+      summary: Searches for main dish products by name.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The search term for the main dish.
+      responses:
+        '200':
+          description: Search results for main dishes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/food'
+        '500':
+          description: Server error.
+
+  /products/searchdrk/{id}:
+    get:
+      tags:
+        - Product
+      summary: Searches for drink products by name.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The search term for the drink.
+      responses:
+        '200':
+          description: Search results for drinks.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/food'
+        '500':
+          description: Server error.
+
+
+
+  /carts/chkcart:
+    get:
+      tags:
+        - Cart
+      summary: Check cart session details
+      responses:
+        '200':
+          description: Cart session information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/carts'
+
+  /carts/addcart:
+    post:
+      tags:
+        - Cart
+      summary: Add a new cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cusId:
+                  type: string
+      responses:
+        '200':
+          description: Cart creation response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cartOK:
+                    type: boolean
+                  messageAddCart:
+                    type: string
+
+  /carts/addcartdtl:
+    post:
+      tags:
+        - Cart
+      summary: Add a product to the cart details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cartId:
+                  type: string
+                pdId:
+                  type: string
+                pdPrice:
+                  type: number
+      responses:
+        '200':
+          description: Cart detail addition response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cartDtlOK:
+                    type: boolean
+                  messageAddCartDtl:
+                    type: string
+
+  /carts/sumcart:
+    get:
+      tags:
+        - Cart
+      summary: Get cart total quantity and amount
+      responses:
+        '200':
+          description: Cart summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  qty:
+                    type: integer
+                  money:
+                    type: number
+
+  /carts/getcart/{id}:
+    get:
+      tags:
+        - Cart
+      summary: Get specific cart information by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Cart ID
+      responses:
+        '200':
+          description: Cart information
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/carts'
+
+  /carts/getcartdtl/{id}:
+    get:
+      tags:
+        - Cart
+      summary: Get details of a specific cart
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Cart ID
+      responses:
+        '200':
+          description: Cart detail information
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/cartDtl'
+
+  /carts/getcartbycus:
+    post:
+      tags:
+        - Cart
+      summary: Get all carts by a specific customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+      responses:
+        '200':
+          description: Carts for a specific customer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/carts'
+
+  /carts/updatecartdtl:
+    post:
+      tags:
+        - Cart
+      summary: Update the quantity of a specific item in cart details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cartId:
+                  type: string
+                pdId:
+                  type: string
+                newQty:
+                  type: integer
+      responses:
+        '200':
+          description: Cart detail update response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /carts/confirmOrder:
+    post:
+      tags:
+        - Cart
+      summary: Confirm a cart as an order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cartId:
+                  type: string
+                cartCf:
+                  type: boolean
+      responses:
+        '200':
+          description: Order confirmation response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /carts/delete/{id}:
+    delete:
+      tags:
+        - Cart
+      summary: Delete a specific cart by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Cart ID
+      responses:
+        '200':
+          description: Cart deletion response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /carts/create:
+    post:
+      tags:
+        - Cart
+      summary: Create a new cart (duplicate of addcart)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cusId:
+                  type: string
+      responses:
+        '200':
+          description: Cart creation response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cartOK:
+                    type: boolean
+                  messageAddCart:
+                    type: string
+
+components:
+  schemas:
+    cartDtl:
+      type: object
+      properties:
+        cartId:
+          type: string
+        pdId:
+          type: string
+        qty:
+          type: integer
+        price:
+          type: number
+    carts:
+      type: object
+      properties:
+        cartId:
+          type: string
+        cusId:
+          type: string
+        cartDate:
+          type: string
+          format: date
+        cartCf:
+          type: boolean
+    food:
+      type: object
+      properties:
+        foodId:
+          type: string
+        foodName:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        category:
+          type: string
+    members:
+      type: object
+      properties:
+        memEmail:
+          type: string
+        memName:
+          type: string
+        dutyId:
+          type: string
+        memHash:
+          type: string
+    memberCreate:
+      type: object
+      properties:
+        memEmail:
+          type: string
+        memName:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+    memberLogin:
+      type: object
+      properties:
+        loginname:
+          type: string
+        password:
+          type: string
+          writeOnly: true
